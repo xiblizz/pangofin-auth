@@ -14,6 +14,8 @@
         try {
             await login(username, password)
             success = true
+            message = 'Auth successful!'
+            loading = false
         } catch (err) {
             message = err?.message || 'Login failed'
             loading = false
@@ -67,7 +69,12 @@
         </div>
 
         {#if message}
-            <div class="message error">{message}</div>
+            <div
+                class="message error"
+                class:success
+            >
+                {message}
+            </div>
         {/if}
 
         {#if loading}
@@ -158,5 +165,10 @@
         font-size: 0.875rem;
         text-align: center;
         white-space: nowrap;
+    }
+
+    .message.success {
+        border-color: var(--green-500, #22c55e);
+        color: var(--green-500, #22c55e);
     }
 </style>

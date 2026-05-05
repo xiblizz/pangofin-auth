@@ -28,7 +28,6 @@ Copy `.env.example` to `.env` and fill in values. Important environment variable
 - `PANGOLIN_API_URL` — base URL of the Pangolin API (e.g. `http://localhost:3000/api`).
 - `PANGOLIN_API_KEY` — API key used to call Pangolin.
 - `RESOURCE_IDS` — comma-separated Pangolin resource IDs to add IP rules to (e.g. `res1,res2`).
-- `REDIRECT_URL` — redirect URL after successful login (optional for UI flows).
 - `MAX_IPS_PER_USER` — maximum number of IPs to keep per user (default: `5`).
 
 See `.env.example` for a template.

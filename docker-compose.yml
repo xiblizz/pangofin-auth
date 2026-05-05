@@ -12,7 +12,6 @@ services:
             PANGOLIN_API_URL: ${PANGOLIN_API_URL}
             PANGOLIN_API_KEY: ${PANGOLIN_API_KEY}
             RESOURCE_IDS: ${RESOURCE_IDS}
-            REDIRECT_URL: ${REDIRECT_URL}
             MAX_IPS_PER_USER: ${MAX_IPS_PER_USER:-5}
 
 volumes:
