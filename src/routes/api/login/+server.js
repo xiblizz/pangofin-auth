@@ -4,20 +4,14 @@ import { getUserIPs, getIPEntry, addUserIP, addIPRule, getIPRules, removeUserIP 
 
 const strip = (s) => s.replace(/\/$/, '')
 
-const JELLYFIN_URL = env.JELLYFIN_URL
-const PANGOLIN_API_URL = env.PANGOLIN_API_URL
-const PANGOLIN_API_KEY = env.PANGOLIN_API_KEY
-const RESOURCE_IDS = env.RESOURCE_IDS.split(',').map((s) => s.trim())
-const MAX_IPS_PER_USER = parseInt(env.MAX_IPS_PER_USER) || 5
-
 /** Deletes a Pangolin rule by rule id. */
-async function deletePangolinRule(fetch, resourceId, ruleId) {
-    const url = `${strip(PANGOLIN_API_URL)}/v1/resource/${resourceId}/rule/${ruleId}`
+async function deletePangolinRule(fetch, pangolinApiUrl, apiKey, resourceId, ruleId) {
+    const url = `${strip(pangolinApiUrl)}/v1/resource/${resourceId}/rule/${ruleId}`
     const res = await fetch(url, {
         method: 'DELETE',
         headers: {
             'Content-Type': 'application/json',
-            Authorization: `Bearer ${PANGOLIN_API_KEY}`,
+            Authorization: `Bearer ${apiKey}`,
         },
     })
     if (res.status < 200 || res.status >= 300) {
@@ -35,13 +29,14 @@ export async function POST(event) {
         const ip = event.getClientAddress()
         const { username, password } = await request.json()
 
-        if (!JELLYFIN_URL || !PANGOLIN_API_URL || !PANGOLIN_API_KEY || !RESOURCE_IDS) {
-            console.error('Missing required environment variables', {
-                JELLYFIN_URL,
-                PANGOLIN_API_URL,
-                PANGOLIN_API_KEY,
-                RESOURCE_IDS,
-            })
+        const JELLYFIN_URL = env.JELLYFIN_URL
+        const PANGOLIN_API_URL = env.PANGOLIN_API_URL
+        const PANGOLIN_API_KEY = env.PANGOLIN_API_KEY
+        const RESOURCE_IDS = env.RESOURCE_IDS?.split(',').map((s) => s.trim())
+        const MAX_IPS_PER_USER = parseInt(env.MAX_IPS_PER_USER) || 5
+
+        if (!JELLYFIN_URL || !PANGOLIN_API_URL || !PANGOLIN_API_KEY || !RESOURCE_IDS?.length) {
+            console.error('Missing required environment variables')
             return json({ success: false, message: 'Server misconfiguration' }, { status: 500 })
         }
 
@@ -73,7 +68,22 @@ export async function POST(event) {
                 const oldest = userIPs[0]
                 const oldRules = getIPRules(oldest.id)
                 for (const rule of oldRules) {
-                    await deletePangolinRule(event.fetch, rule.resource_id, rule.rule_id)
+                    const res = await fetch(
+                        `${strip(PANGOLIN_API_URL)}/v1/resource/${rule.resource_id}/rule/${rule.rule_id}`,
+                        {
+                            method: 'DELETE',
+                            headers: {
+                                'Content-Type': 'application/json',
+                                Authorization: `Bearer ${PANGOLIN_API_KEY}`,
+                            },
+                        },
+                    )
+                    if (res.status < 200 || res.status >= 300) {
+                        console.error(
+                            `Failed to delete Pangolin rule ${rule.rule_id} for resource ${rule.resource_id}:`,
+                            await res.text(),
+                        )
+                    }
                 }
                 removeUserIP(oldest.id)
                 console.log(`Evicted oldest IP ${oldest.ip} for user ${userId}`)
