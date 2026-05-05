@@ -1,0 +1,19 @@
+services:
+    app:
+        build: .
+        container_name: pangofin-auth
+        restart: unless-stopped
+        ports:
+            - '3000:3000'
+        volumes:
+            - db-data:/app/data
+        environment:
+            JELLYFIN_URL: ${JELLYFIN_URL}
+            PANGOLIN_API_URL: ${PANGOLIN_API_URL}
+            PANGOLIN_API_KEY: ${PANGOLIN_API_KEY}
+            RESOURCE_IDS: ${RESOURCE_IDS}
+            REDIRECT_URL: ${REDIRECT_URL}
+            MAX_IPS_PER_USER: ${MAX_IPS_PER_USER:-5}
+
+volumes:
+    db-data:

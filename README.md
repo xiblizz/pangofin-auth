@@ -1,157 +1,90 @@
-# sveltekit-bun-template
+# Pangofin-Auth - Jellyfin Pangolin Auth
 
-A minimal [SvelteKit](https://kit.svelte.dev) template using [Bun](https://bun.sh) as the package manager and runtime, **native JavaScript** (no TypeScript), **Svelte component-internal CSS** for scoped styles, and a **shadcn-inspired Slate dark UI kit** in `src/lib/ui.css`.
+A small SvelteKit + Bun app that authenticates Jellyfin users and automatically manages IP "pass" rules in Pangolin resources. The app tracks the last N IP addresses used by each user in a local SQLite database and, when a user authenticates from a new IP and has more than the configured limit, evicts the oldest IP and removes its associated Pangolin rules.
 
-## Features
+## Key features
 
-- ⚡ **[Bun](https://bun.sh)** — fast package manager and runtime
-- 🧩 **[SvelteKit](https://kit.svelte.dev)** with Svelte 5
-- 🟨 **Native JavaScript** — no TypeScript configuration
-- 🎨 **Svelte `<style>`** — co-located scoped CSS inside every `.svelte` component
-- 🌑 **`ui.css`** — shadcn-inspired Slate dark UI kit with CSS custom properties
-- 🔌 **API routes** — boilerplate `GET /api/hello` endpoint via `+server.js`
-- 🚫 **Zero UI dependencies** — all styles are plain CSS
+- Authenticate users against Jellyfin (`/Users/AuthenticateByName`).
+- Add IP-based "ACCEPT" rules to one or more Pangolin resources per successful login.
+- Track the most recent IP addresses per user in a local SQLite DB and evict the oldest when exceeding the configured limit.
+- Minimal stack: Bun runtime, SvelteKit, SQLite (no external DB required).
+- Docker-ready with a multi-stage `Dockerfile` and `docker-compose.yml` included.
 
-## Quickstart
+## Quickstart (development)
 
 ```bash
-# Install dependencies
+# install dependencies
 bun install
 
-# Start dev server
+# run dev server (hot reload)
 bun run dev
-
-# Build for production
-bun run build
-
-# Preview production build
-bun run preview
 ```
 
-## Project Structure
+## Environment
 
-```
-src/
-├── app.html              # HTML entry point
-├── app.css               # Global styles (imports ui.css)
-├── lib/
-│   ├── ui.css            # Shadcn-slate dark UI kit
-│   ├── utils.js          # Shared utilities (cn helper)
-│   └── index.js          # Library entry point
-└── routes/
-    ├── +layout.svelte    # Root layout
-    ├── +page.js          # Load function (fetches from /api/hello)
-    ├── +page.svelte      # Demo / showcase page (styles in <style> block)
-    └── api/
-        └── hello/
-            └── +server.js  # GET /api/hello endpoint
-```
+Copy `.env.example` to `.env` and fill in values. Important environment variables:
 
-## `ui.css` — Shadcn Slate Dark UI Kit
+- `JELLYFIN_URL` — base URL of your Jellyfin server (e.g. `http://localhost:8096`).
+- `PANGOLIN_API_URL` — base URL of the Pangolin API (e.g. `http://localhost:3000/api`).
+- `PANGOLIN_API_KEY` — API key used to call Pangolin.
+- `RESOURCE_IDS` — comma-separated Pangolin resource IDs to add IP rules to (e.g. `res1,res2`).
+- `REDIRECT_URL` — redirect URL after successful login (optional for UI flows).
+- `MAX_IPS_PER_USER` — maximum number of IPs to keep per user (default: `5`).
 
-`src/lib/ui.css` provides a complete dark theme based on the Slate color palette (shadcn-style). It is imported globally via `app.css` and all CSS custom properties are available everywhere.
+See `.env.example` for a template.
 
-### Design Tokens
+## How it works
 
-```css
-/* Colors */
---background        /* slate-950  #020617 */
---foreground        /* slate-50   #f8fafc */
---card              /* slate-900  #0f172a */
---primary           /* slate-50   #f8fafc */
---secondary         /* slate-800  #1e293b */
---muted             /* slate-800  #1e293b */
---muted-foreground  /* slate-400  #94a3b8 */
---accent            /* slate-700  #334155 */
---border            /* slate-800  #1e293b */
---destructive       /* red-900    #7f1d1d */
+1. Client posts `{ username, password }` to `POST /api/login`.
+2. Server authenticates with Jellyfin. On success, it obtains the `userId`.
+3. Server checks whether the request IP is already tracked for that `userId` in the local SQLite DB.
+4. If the IP is new and the user already has `MAX_IPS_PER_USER` tracked, the server:
+    - deletes the oldest IP entry from the DB,
+    - removes any Pangolin rules previously created for that IP (via the Pangolin API),
+    - then continues to add the new IP's rules.
+5. The server adds IP ACCEPT rules to each configured `RESOURCE_ID` (if they don't already exist) and records the Pangolin rule IDs in the DB so they can be cleaned up later.
 
-/* Radius */
---radius-sm / --radius / --radius-lg / --radius-full
+## Database
 
-/* Typography */
---font-sans / --font-mono
---text-xs … --text-4xl
---font-normal / --font-medium / --font-semibold / --font-bold
+- The app creates a small SQLite database with two tables: `user_ips` and `ip_rules`.
+- Default DB path: `./data/auth.db`. In Docker the DB is persisted in a volume at `/app/data`.
+- You can override the DB path with the `DB_PATH` environment variable.
 
-/* Shadows, Transitions, Spacing */
---shadow-sm … --shadow-lg
---transition-fast / --transition / --transition-slow
---space-1 … --space-16
-```
+Implementation files of interest:
 
-### Component Classes
+- `src/lib/db.js` — SQLite helpers and schema.
+- `src/routes/api/login/+server.js` — Jellyfin auth, Pangolin calls, and IP tracking/eviction logic.
 
-| Category      | Classes |
-|---------------|---------|
-| **Button**    | `.btn`, `.btn-primary`, `.btn-secondary`, `.btn-outline`, `.btn-ghost`, `.btn-destructive`, `.btn-link`, `.btn-sm`, `.btn-lg`, `.btn-icon` |
-| **Badge**     | `.badge`, `.badge-default`, `.badge-secondary`, `.badge-outline`, `.badge-destructive`, `.badge-success` |
-| **Card**      | `.card`, `.card-header`, `.card-title`, `.card-description`, `.card-content`, `.card-footer` |
-| **Form**      | `.input`, `.textarea`, `.select`, `.label`, `.form-item`, `.form-message` |
-| **Alert**     | `.alert`, `.alert-destructive`, `.alert-success` |
-| **Table**     | `.table-wrapper`, `.table` |
-| **Avatar**    | `.avatar`, `.avatar-sm`, `.avatar-lg`, `.avatar-xl` |
-| **Loading**   | `.skeleton`, `.spinner`, `.spinner-sm`, `.spinner-lg` |
-| **Progress**  | `.progress`, `.progress-bar` |
-| **Nav**       | `.nav`, `.nav-item`, `.sidebar-nav`, `.sidebar-nav-item` |
-| **Layout**    | `.container`, `.container-sm/md/lg/xl/2xl`, `.flex`, `.flex-col`, `.grid`, `.grid-cols-*` |
-| **Typography**| `.lead`, `.muted`, `.small`, `.code`, `h1–h6` |
+## Docker
 
-## Svelte Component CSS
+This repo contains a multi-stage `Dockerfile` and a `docker-compose.yml`. The container runs the production build and persists the SQLite DB in a named volume.
 
-Write styles inside the component's `<style>` block. Svelte's compiler automatically scopes them to the component. `ui.css` CSS custom properties are available everywhere.
+Basic Docker Compose usage:
 
-```svelte
-<!-- MyComponent.svelte -->
-<script>
-  // no import needed — styles live below
-</script>
+```bash
+# copy and fill environment
+cp .env.example .env
 
-<div class="wrapper">
-  <h2 class="title">Hello</h2>
-  <!-- ui.css global classes work alongside local styles -->
-  <button class="btn btn-primary">Action</button>
-</div>
+# build and start
+docker compose up -d --build
 
-<style>
-  .wrapper {
-    padding: var(--space-6);
-    background-color: var(--card);
-    border-radius: var(--radius-lg);
-    border: 1px solid var(--border);
-  }
+# view logs
+docker compose logs -f
 
-  .title {
-    color: var(--foreground);
-    font-size: var(--text-2xl);
-    margin-bottom: var(--space-4);
-  }
-</style>
+# stop and remove
+docker compose down
 ```
 
-## API Routes
+## Development notes
 
-SvelteKit `+server.js` files export HTTP method handlers. Add your endpoints under `src/routes/api/`.
+- The project uses Bun as the package manager and runtime. Use `bun install` and `bun run` to manage and run the app locally.
+- The Pangolin API endpoints used by the project may vary across Pangolin versions — verify the rule creation and deletion endpoints if you upgrade Pangolin.
 
-```js
-// src/routes/api/hello/+server.js
-import { json } from '@sveltejs/kit';
+## Security & operational notes
 
-export function GET({ url }) {
-  const name = url.searchParams.get('name') ?? 'World';
-  return json({ message: `Hello, ${name}!`, timestamp: new Date().toISOString() });
-}
-```
-
-Fetch from the server or client using SvelteKit's load functions:
-
-```js
-// src/routes/+page.js
-export async function load({ fetch }) {
-  const res = await fetch('/api/hello?name=SvelteKit');
-  return { greeting: await res.json() };
-}
-```
+- Keep `PANGOLIN_API_KEY` secret and do not commit `.env` to version control.
+- If running in production, consider restricting access to the Pangolin API and securing your Docker host.
+- Monitor and rotate API keys as needed.
 
 ## License
 
