@@ -172,7 +172,7 @@ export async function POST(event) {
         }
 
         // redirect to a url
-        redirect(303, env.REDIRECT_URL || '/')
+        throw redirect(301, env.REDIRECT_URL || '/')
     } catch (err) {
         console.error('Unexpected error in /api/login', err)
         return json({ success: false, message: 'Internal server error' }, { status: 500 })

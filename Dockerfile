@@ -29,4 +29,6 @@ RUN mkdir -p /app/data
 
 EXPOSE 3000
 
+ENV ADDRESS_HEADER=X-Forwarded-For
+
 CMD ["bun", "./build/index.js"]
