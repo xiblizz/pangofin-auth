@@ -4,7 +4,7 @@ services:
         container_name: pangofin-auth
         restart: unless-stopped
         ports:
-            - '3000:3000'
+            - ${PORT:-3579}:3000
         volumes:
             - db-data:/app/data
         environment:
