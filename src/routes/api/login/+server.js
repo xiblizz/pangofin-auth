@@ -173,7 +173,10 @@ export async function POST(event) {
 
         // redirect to a url
         throw redirect(301, env.REDIRECT_URL || '/')
+        return json({ success: true, message: 'Auth successful' })
     } catch (err) {
+        // SvelteKit redirect/error responses are thrown intentionally — re-throw them
+        if (err?.status && err?.location) throw err
         console.error('Unexpected error in /api/login', err)
         return json({ success: false, message: 'Internal server error' }, { status: 500 })
     }
