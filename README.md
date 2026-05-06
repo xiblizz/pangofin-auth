@@ -31,7 +31,7 @@ docker compose down
 Copy `.env.example` to `.env` and fill in values. Important environment variables:
 
 - `JELLYFIN_URL` — base URL of your Jellyfin server (e.g. `http://localhost:8096`).
-- `PANGOLIN_API_URL` — base URL of the Pangolin API (e.g. `http://api.pangolin.mydomain.com`).
+- `PANGOLIN_API_URL` — base URL of the Pangolin API (e.g. `https://api.pangolin.mydomain.com`).
 - `PANGOLIN_API_KEY` — API key used to call Pangolin.
 - `RESOURCE_IDS` — comma-separated Pangolin resource IDs to add IP rules to (e.g. `1,3,5`).
 - `MAX_IPS_PER_USER` — maximum number of IPs to keep per user (default: `5`).
