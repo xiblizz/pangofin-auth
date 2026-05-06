@@ -1,6 +1,11 @@
+<br />
 <p align="center">
-# Pangofin-Auth - Jellyfin Pangolin Auth
+    <b>Pangofin-Auth</b>
 </p>
+<p align="center">
+    Jellyfin Auth Pangolin Rules
+</p>
+<br />
 
 A small SvelteKit + Bun app that authenticates Jellyfin users and automatically manages IP "ACCEPT" rules in Pangolin resources. The app tracks the last N IP addresses used by each user in a local SQLite database and, when a user authenticates from a new IP and has more than the configured limit, evicts the oldest IP and removes its associated Pangolin rules.
 
