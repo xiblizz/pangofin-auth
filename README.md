@@ -1,6 +1,8 @@
+<p align="center">
 # Pangofin-Auth - Jellyfin Pangolin Auth
+</p>
 
-A small SvelteKit + Bun app that authenticates Jellyfin users and automatically manages IP "pass" rules in Pangolin resources. The app tracks the last N IP addresses used by each user in a local SQLite database and, when a user authenticates from a new IP and has more than the configured limit, evicts the oldest IP and removes its associated Pangolin rules.
+A small SvelteKit + Bun app that authenticates Jellyfin users and automatically manages IP "ACCEPT" rules in Pangolin resources. The app tracks the last N IP addresses used by each user in a local SQLite database and, when a user authenticates from a new IP and has more than the configured limit, evicts the oldest IP and removes its associated Pangolin rules.
 
 ## Key features
 
@@ -9,6 +11,10 @@ A small SvelteKit + Bun app that authenticates Jellyfin users and automatically 
 - Track the most recent IP addresses per user in a local SQLite DB and evict the oldest when exceeding the configured limit.
 - Minimal stack: Bun, SvelteKit, SQLite.
 - Docker-ready with a multi-stage `Dockerfile` and `docker-compose.yml` included.
+
+## Use Case Example
+
+Imagine you have a Jellyfin instance with all your ripped personal DVDs at home and your kids are at a friends house and want to watch them, but you dont want to make accounts for your kids in your Pangolin instance. With this app, they can login with their Jellyfin account to create rules in your Pangolin instance that will allow the IP of their friends home to connect.
 
 ## Usage (Docker Compose)
 
@@ -59,6 +65,10 @@ Implementation files of interest:
 - `src/lib/db.js` — SQLite helpers and schema.
 - `src/routes/api/login/+server.js` — Jellyfin auth, Pangolin calls, and IP tracking/eviction logic.
 
+## To-Do List
+
+- Automatic redirect after authentication
+  
 ## Development
 
 ```bash
