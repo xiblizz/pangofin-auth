@@ -15,11 +15,13 @@
         success = false
         try {
             data = await login(username, password)
-            success = true
-            message = 'Authentication successful!'
-            loading = false
+            if (data?.success) {
+                success = true
+                message = 'Authentication successful!'
+            }
         } catch (err) {
             message = err?.message || 'Authentication failed!'
+        } finally {
             loading = false
         }
     }
