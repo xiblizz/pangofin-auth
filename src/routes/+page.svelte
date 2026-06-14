@@ -14,7 +14,7 @@
         loading = true
         success = false
         try {
-            await login(username, password)
+            data = await login(username, password)
             success = true
             message = 'Authentication successful!'
             loading = false
