@@ -16,10 +16,10 @@
         try {
             await login(username, password)
             success = true
-            message = 'Auth successful!'
+            message = 'Authentication successful!'
             loading = false
         } catch (err) {
-            message = err?.message || 'Login failed'
+            message = err?.message || 'Authentication failed!'
             loading = false
         }
     }
@@ -207,9 +207,16 @@
     .link {
         border: 1px solid #6e75cc;
         padding: 1rem 2rem;
+        background-color: var(--slate-800, #1e1e1e);
         border-radius: var(--radius-sm);
         text-align: center;
         text-decoration: none;
-        color: #6e75cc;
+        color: hsl(236, 48%, 62%);
+        transition: 200ms ease;
+
+        &:hover {
+            background-color: var(--slate-700, #2e2e2e);
+            color: hsl(236, 52%, 66%);
+        }
     }
 </style>
