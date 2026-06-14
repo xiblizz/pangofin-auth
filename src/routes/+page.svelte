@@ -193,7 +193,7 @@
     }
 
     .message.success {
-        border-color: var(--green-500, #22c55e);
+        /* border-color: var(--green-500, #22c55e); */
         color: var(--green-500, #22c55e);
     }
 
@@ -201,6 +201,7 @@
         display: flex;
         flex-direction: column;
         gap: 1rem;
+        margin-top: 1rem;
     }
 
     .link {

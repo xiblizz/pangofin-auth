@@ -30,12 +30,13 @@ export async function POST(event) {
         const { username, password } = await request.json()
 
         const JELLYFIN_URL = env.JELLYFIN_URL
+        const JELLYFIN_PUBLIC_URL = env.JELLYFIN_PUBLIC_URL
         const PANGOLIN_API_URL = env.PANGOLIN_API_URL
         const PANGOLIN_API_KEY = env.PANGOLIN_API_KEY
         const RESOURCE_IDS = env.RESOURCE_IDS?.split(',').map((s) => s.trim())
         const MAX_IPS_PER_USER = parseInt(env.MAX_IPS_PER_USER) || 5
 
-        if (!JELLYFIN_URL || !PANGOLIN_API_URL || !PANGOLIN_API_KEY || !RESOURCE_IDS?.length) {
+        if (!JELLYFIN_URL || !JELLYFIN_PUBLIC_URL || !PANGOLIN_API_URL || !PANGOLIN_API_KEY || !RESOURCE_IDS?.length) {
             console.error('Missing required environment variables')
             return json({ success: false, message: 'Server misconfiguration' }, { status: 500 })
         }

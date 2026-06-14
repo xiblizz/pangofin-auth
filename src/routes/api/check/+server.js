@@ -12,7 +12,7 @@ export async function GET(event) {
         const PANGOLIN_API_KEY = env.PANGOLIN_API_KEY
         const RESOURCE_IDS = env.RESOURCE_IDS?.split(',').map((s) => s.trim())
 
-        if (!PANGOLIN_API_URL || !PANGOLIN_API_KEY || !RESOURCE_IDS?.length) {
+        if (!JELLYFIN_URL || !JELLYFIN_PUBLIC_URL || !PANGOLIN_API_URL || !PANGOLIN_API_KEY || !RESOURCE_IDS?.length) {
             console.error('Missing required environment variables')
             return json({ success: false, message: 'Server misconfiguration' }, { status: 500 })
         }
