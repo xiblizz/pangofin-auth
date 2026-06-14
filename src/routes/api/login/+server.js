@@ -1,4 +1,4 @@
-import { json, redirect } from '@sveltejs/kit'
+import { json } from '@sveltejs/kit'
 import { env } from '$env/dynamic/private'
 import { getUserIPs, getIPEntry, addUserIP, addIPRule, getIPRules, removeUserIP } from '$lib/db.js'
 

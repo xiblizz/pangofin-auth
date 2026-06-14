@@ -1,6 +1,8 @@
 <script>
     import login from '$lib/login'
 
+    let { data } = $props()
+
     let username = ''
     let password = ''
     let message = ''
@@ -20,6 +22,11 @@
             message = err?.message || 'Login failed'
             loading = false
         }
+    }
+
+    if (data?.hasAccess) {
+        success = true
+        message = 'Already authenticated!'
     }
 </script>
 
@@ -74,6 +81,16 @@
                 class:success
             >
                 {message}
+                {#if data?.links.length > 0}
+                    <div class="links">
+                        {#each data.links as link}
+                            <a
+                                href={link.href}
+                                class="btn link">{link.text}</a
+                            >
+                        {/each}
+                    </div>
+                {/if}
             </div>
         {/if}
 
@@ -170,5 +187,20 @@
     .message.success {
         border-color: var(--green-500, #22c55e);
         color: var(--green-500, #22c55e);
+    }
+
+    .links {
+        display: flex;
+        flex-direction: column;
+        gap: 0.5rem;
+    }
+
+    .link {
+        border: 1px solid #6e75cc;
+        padding: 0.5rem 1rem;
+        border-radius: var(--radius-sm);
+        text-align: center;
+        text-decoration: none;
+        color: #6e75cc;
     }
 </style>
