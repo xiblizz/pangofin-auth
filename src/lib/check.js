@@ -1,4 +1,4 @@
-export async function checkIPAccess() {
+export default async function checkAccess() {
     try {
         const res = await fetch('/api/check')
         if (res.ok) {

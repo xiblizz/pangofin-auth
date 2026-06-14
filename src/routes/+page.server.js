@@ -1,5 +1,5 @@
-import { checkIPAccess } from '$lib/check'
+import checkAccess from '$lib/check'
 
 export async function load() {
-    return await checkIPAccess()
+    return await checkAccess()
 }
