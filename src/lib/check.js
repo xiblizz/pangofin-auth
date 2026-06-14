@@ -1,8 +1,6 @@
-import { env } from '$env/dynamic/private'
-
-export default async function checkAccess() {
+export default async function checkAccess(fetch) {
     try {
-        let res = await fetch(`${env.BASE_URL}/api/check`)
+        let res = await fetch(`/api/check`)
         if (res.ok) {
             let data = await res.json()
             if (data.success) {

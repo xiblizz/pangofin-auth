@@ -1,5 +1,5 @@
 import checkAccess from '$lib/check'
 
-export async function load() {
-    return await checkAccess()
+export async function load({ fetch }) {
+    return await checkAccess(fetch)
 }
