@@ -9,6 +9,7 @@ services:
             - db-data:/app/data
         environment:
             JELLYFIN_URL: ${JELLYFIN_URL}
+            JELLYFIN_PUBLIC_URL: ${JELLYFIN_PUBLIC_URL}
             PANGOLIN_API_URL: ${PANGOLIN_API_URL}
             PANGOLIN_API_KEY: ${PANGOLIN_API_KEY}
             RESOURCE_IDS: ${RESOURCE_IDS}
