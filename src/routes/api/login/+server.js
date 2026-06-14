@@ -172,7 +172,11 @@ export async function POST(event) {
         }
 
         // redirect to a url
-        return json({ success: true, message: 'Auth successful' })
+        return json({
+            success: true,
+            message: 'Auth successful',
+            links: [{ href: JELLYFIN_PUBLIC_URL || JELLYFIN_URL, text: 'Jellyfin' }],
+        })
     } catch (err) {
         console.error('Unexpected error in /api/login', err)
         return json({ success: false, message: 'Internal server error' }, { status: 500 })

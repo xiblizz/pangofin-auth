@@ -77,8 +77,9 @@
 
         {#if message}
             <div
-                class="message error"
+                class="message"
                 class:success
+                class:error={!success}
             >
                 {message}
                 {#if data?.links.length > 0}
@@ -173,15 +174,22 @@
 
     .message {
         position: absolute;
-        top: 100%;
-        margin-top: 0.5rem;
-        border: 1px solid var(--red-500, #ef4444);
+        top: 50%;
+        left: 50%;
+        transform: translate(-50%, -50%);
+        background-color: var(--slate-800, #1e1e1e);
+        border: 1px solid var(--slate-600, #2e2e2e);
         border-radius: var(--radius-sm);
-        padding: 0.75rem 1rem;
+        padding: 1rem 2rem;
         color: var(--red-500, #ef4444);
         font-size: 0.875rem;
         text-align: center;
         white-space: nowrap;
+    }
+
+    .message.error {
+        border-color: var(--red-500, #ef4444);
+        color: var(--red-500, #ef4444);
     }
 
     .message.success {
@@ -192,12 +200,12 @@
     .links {
         display: flex;
         flex-direction: column;
-        gap: 0.5rem;
+        gap: 1rem;
     }
 
     .link {
         border: 1px solid #6e75cc;
-        padding: 0.5rem 1rem;
+        padding: 1rem 2rem;
         border-radius: var(--radius-sm);
         text-align: center;
         text-decoration: none;
