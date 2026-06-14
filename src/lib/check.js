@@ -1,4 +1,4 @@
-import env from '$env/dynamic/public'
+import { env } from '$env/dynamic/private'
 
 export default async function checkAccess() {
     try {
